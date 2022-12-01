@@ -1,5 +1,6 @@
 import object 
 import pygame
+import utils
 
 SCREEN_SIZE = (960, 640)        # 全部大文字のやつ: 定数
 
@@ -28,14 +29,19 @@ def main():
     running = True
     while running:
         
-        for event in pygame.event.get():
-                if event.type == pygame.QUIT:
+        for event in pygame.event.get():            # 
+                if event.type == pygame.QUIT:       # イベントQUIT: 出る、アプリを止める
                     running = False
-                
                 elif event.type == pygame.KEYDOWN:
                     if event.key == pygame.K_RETURN:
                         player.attack(enemy)
+                        enemy.random_attack((player))
                         print("player attacked!")
+        
+        who_win = utils.get_who_win([player, enemy])
+        print(who_win)
+        if who_win != None:
+            running = False
         
         clock.tick(30)
         
