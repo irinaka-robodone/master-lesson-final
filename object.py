@@ -3,10 +3,10 @@ import pygame
 
 class Enemy():
     
-    def __init__(self, hp, speed_hp_increase) -> None:
+    def __init__(self, hp, guard) -> None:
         self.hp = hp
         self.type = "Enemy"
-        self.speed_hp_increase = speed_hp_increase
+        # self.speed_hp_increase = speed_hp_increase
 
     def is_die(self):
         if self.hp <= 0: 
@@ -52,12 +52,6 @@ class Player():
         print("Game Over!")
         
         
-player = Player(10,20,30)
-enemy = Enemy(20, 0.1)
-
-
-player.attack(enemy)
-
 
 
 """
