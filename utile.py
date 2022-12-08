@@ -7,5 +7,4 @@ def get_who_win(object_list:list):
             else:
                 print("You win!!")
             return object.type
-        else:
-            return None
+    return None
