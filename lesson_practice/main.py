@@ -1,6 +1,6 @@
-import objeckt
+import lesson_practice.objeckt as objeckt
 import pygame
-import utils
+import lesson_practice.utils as utils
 
 SCREEN_SIZE = (960,640)
 clock=pygame.time.Clock()
