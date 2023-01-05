@@ -1,6 +1,6 @@
-import object
+import rensyu.object as object
 import pygame
-import utile
+import rensyu.material.utile as utile
 
 
 SCREEN_SIZE = (900,425)  #全部大文字のやつは定数
