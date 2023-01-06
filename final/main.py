@@ -1,7 +1,6 @@
 import pygame
 import sys
 from pygame.locals import *
-from text import Text
 import pygame_gui
 
 SCREEN_SIZE=(900,600)
@@ -54,6 +53,9 @@ def main():
             elif event.type == pygame.KEYDOWN:
                 if event.key == pygame.K_RETURN:
                     pass
+                elif event.key == 96:
+                    print("Pressed!")
+                    
             elif event.type == pygame_gui.UI_TEXT_ENTRY_FINISHED and event.ui_object_id == "#main_text_entry":
                 show_text(window, event.text)
             manager.process_events(event)
