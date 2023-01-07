@@ -2,10 +2,15 @@ import csv
 import pprint
 import object
 from object import Puizu
+import random
 
-def puizuBOX():
+#def callback_func():
+
+
+
+def puizuBOX(file):
     puizus=[]
-    with open('bun.csv', encoding="utf-8") as f:
+    with open(file, encoding="utf-8") as f:
         #print(f.read())
         reader=csv.reader(f)
 
@@ -20,7 +25,8 @@ def puizuBOX():
                 puizu.answer=row[2]
                 puizu.choices=row[3]
                 print(puizu)
-                puizus.append([puizu])
+                puizus.append(puizu)
     return puizus
-puizues=puizuBOX()
-print(puizues)
+# puizues=puizuBOX()
+# puizues = puizues[random.randint(0,2)]
+# print(puizues)
