@@ -24,9 +24,8 @@ def puizuBOX(file):
                 puizu.type=row[1]
                 puizu.answer=row[2]
                 puizu.choices=row[3]
-                print(puizu)
                 puizus.append(puizu)
     return puizus
-# puizues=puizuBOX()
+#puizues=puizuBOX()
 # puizues = puizues[random.randint(0,2)]
 # print(puizues)
