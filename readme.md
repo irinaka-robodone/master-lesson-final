@@ -8,3 +8,5 @@
 - class の概念を学んで実習
 - class で Player, Enemy などのクラスを定義
 - Player, Enemy クラスなどをつかった簡単な格闘ゲーム
+
+
