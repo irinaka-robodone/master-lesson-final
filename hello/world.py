@@ -30,7 +30,8 @@ class World():
     def __init__(self) -> None:
         self.running= True
 
-        self.font = pygame.font.SysFont("pop")
+        # self.font = pygame.font.SysFont("Noto Sans JP", 20)
+        self.font = pygame.font.Font("font/NotoSansJP-Black.otf", 20)
 
         self.curent_scene = "menyu"
 
@@ -39,22 +40,42 @@ class World():
         self.window = pygame.display.set_mode(SCREEN_SIZE)
         self.window.fill((255,255,255))
 
-
-
-    def main(self):
+    def show_start_screen(self):
+        
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 # running = False
                 pygame.quit()
                 sys.exit()
+            elif event.type == pygame.KEYDOWN:
+                if event.key == pygame.K_RETURN:
+                    self.curent_scene = "nyuryoku"
         self.window.fill((255,255,255))
-        new_text = pygame.font.SysFont("MS P ゴシック", 20).render(self.text, True, (10,10,10))
+        new_text = self.font.render("しりとりゲーム‼", True, (10,10,10))
         new_text_rect = new_text.get_rect(center=(SCREEN_SIZE[0]//2, SCREEN_SIZE[1]//2))
         self.window.blit(new_text, new_text_rect)
         pygame.display.flip()
         pygame.display.update()
         clock.tick(FPS)
-
+    
+    def nyuryoku(self):
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                # running = False
+                pygame.quit()
+                sys.exit()
+            elif event.type == pygame.KEYDOWN:
+                if event.key == pygame.K_RETURN:
+                    self.curent_scene = "nyuryoku"
+        self.window.fill((255,255,255))
+        new_text = self.font.render("次", True, (10,10,10))
+        new_text_rect = new_text.get_rect(center=(SCREEN_SIZE[0]//2, SCREEN_SIZE[1]//2))
+        self.window.blit(new_text, new_text_rect)
+        pygame.display.flip()
+        pygame.display.update()
+        clock.tick(FPS)
+        
+    
     def init(self):
         pygame.init()
         pygame.display.set_caption("しりとりゲーム")
@@ -64,5 +85,8 @@ class World():
         return window
 
     def pro(self):
-        if self.curent_scene == "play":
-            self.main()
+        if self.curent_scene == "menyu":
+            self.show_start_screen()
+        elif self.curent_scene == "nyuryoku":
+            self.nyuryoku()
+                
