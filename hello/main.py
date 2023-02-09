@@ -2,7 +2,7 @@ import pygame
 import sys
 from pygame.locals import *
 import pygame_gui
-from World import world
+from world import World
 
 SCREEN_SIZE=(900,600)
 FPS = 60
