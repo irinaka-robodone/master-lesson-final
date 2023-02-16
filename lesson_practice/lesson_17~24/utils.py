@@ -23,7 +23,13 @@ def puizuBOX(file):
                 puizu.question=row[0]
                 puizu.type=row[1]
                 puizu.answer=row[2]
-                puizu.choices=row[3]
+                puizu.choices=[]
+                puizu.choices.append(row[3])
+                puizu.choices.append(row[4])
+                puizu.choices.append(row[5])
+                puizu.choices.append(row[6])
+                
+                
                 puizus.append(puizu)
     return puizus
 #puizues=puizuBOX()
