@@ -17,30 +17,32 @@ running = True
 
 
 class Wold():
-    def __init__(self) -> None:
+    def __init__(self, quiz_filepath: str) -> None:
         
-        self.puizues=puizuBOX("bun.csv")
+        self.puizues=puizuBOX(quiz_filepath)
         self.puizuID = random.randint(0,len(self.puizues)-1)  
         self.puizu= self.puizues[self.puizuID]
+        self.Xmon=len(self.puizues)
         self.puizues.pop(self.puizuID)
         self.now_scene="start"
         self.now_puizu_nom=0
         self.goke=0
         self.font=pygame.font.SysFont("MS UI Gothic", 16)
         self.running=True
-        self.Xmon=len(self.puizues)
-        self.screen=pygame.display.set_mode((400,300))
+        self.screen_size = (900, 600)
+        self.screen=pygame.display.set_mode(self.screen_size)
         self.cotae=self.puizu.answer
         
+        self.tou_answer=0
         
-        self.tou=0
         self.a = self.puizu.choices[0]
         self.b = self.puizu.choices[1]
         self.c = self.puizu.choices[2]
         self.d = self.puizu.choices[3]
-        self.tou_answer=0
+        
         
         self.Q=self.font.render(self.puizu.question,True, (255,255,255))
+    
     def start(self):
         self.screen.fill((255,255,255))
         self.taitoru=self.font.render("クイズゲーム エンターキーを押してね",True, (215,115,215))
@@ -57,7 +59,9 @@ class Wold():
             if event.type == KEYDOWN:  
                 if event.key ==K_RETURN:
                     self.now_scene="game"
-        
+                    self.screen.fill((0,0,0))
+                    
+                            
     def sentaku (self):
         self.sentacu_1=self.font.render(f"A: {self.puizu.choices[0]}",True, (255,255,255))
         self.screen.blit(self.sentacu_1,(50,100))
@@ -76,7 +80,7 @@ class Wold():
             
             
     def main(self):
-        self.screen.fill((0,0,0))
+        # self.screen.fill((0,0,0))
         for event in pygame.event.get():
             if event.type ==K_SPACE:
                 pygame.quit()
@@ -102,6 +106,7 @@ class Wold():
                     self.tou_answer = "4"
                 if event.key in (K_a, K_b,K_c,K_d):
                     self.now_scene="jazzi"
+                    
                 # if event.key ==K_RETURN:
                 #     self.reply()
                 
@@ -110,17 +115,11 @@ class Wold():
                     # self.Q=self.font.render(self.puizu.question,True, (255,255,255))
                     # self.puizues.pop(puizuID)
                     #self.goke += 1
-        print(self.tou, self.puizu.answer)
-                
-        if self.goke == self.Xmon:
-            self.running=False
+        print(self.tou_answer, self.puizu.answer,self.goke)
+
+        
                         
         self.screen.blit(self.Q,(10,10))
-                
-
-    #"押されたキー = " + pygame.key.name(event.key),
-        pygame.display.flip()
-        pygame.display.update() 
         
     def update_display(self):
         pygame.display.flip()
@@ -128,27 +127,26 @@ class Wold():
     
     
         
-    def reply(self):
-        if self.tou == self.puizu.answer:
-            print("yes")
-            self.tou_answer=self.tou
-            # self.Yes=self.font.render("正解",True, (255,255,115))
-            # self.screen.blit(self.Yes,(300,200))
+    # def reply(self):
+    #     if self.tou_answer == self.puizu.answer:
+    #         print("yes")
+    #         # self.Yes=self.font.render("正解",True, (255,255,115))
+    #         # self.screen.blit(self.Yes,(300,200))
             
-            self.tou=0
+    #         #self.tou_answer=0
             
             
-        else:
-            print(self.tou)
-            # self.No=self.font.render("不正解",True, (215,255,255))
-            # self.screen.blit(self.No,(300,100))
+    #     else:
+    #         print(self.tou_answer)
+    #         # self.No=self.font.render("不正解",True, (215,255,255))
+    #         # self.screen.blit(self.No,(300,100))
             
-            self.tou=0
-        
-            
+    #         self.tou_answer=0
         
     def handan(self):
-        self.screen.fill((0,0,0))
+        # self.screen.fill((0,0,0))
+        font = pygame.font.SysFont("MS UI Gothic", 48, bold=True)
+        
         for event in pygame.event.get():
                 if event.type ==K_SPACE:
                     pygame.quit()
@@ -164,29 +162,34 @@ class Wold():
             
         if self.tou_answer == self.puizu.answer:
             print("yes")
-            self.yesno=self.font.render("正解",True, (255,255,115))
-            #self.screen.blit(self.Yes,(300,200))            
-            self.puizuID=random.randint(0,len(self.puizues)-1)
-            self.puizu = self.puizues[self.puizuID]
-            self.Q=self.font.render(self.puizu.question,True, (255,255,255))
-            self.puizues.pop(self.puizuID)
-            self.goke += 1
-            self.now_scene="game"
+            self.yesno = font.render("正解",True, (255,255,115))
         
         else:
             print("No!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!")
-            self.yesno=self.font.render("不正解",True, (215,255,255))
-            self.screen.blit(self.yesno,(300,100))
-            self.update_display()
-            pygame.time.wait(2000)
-            print("test!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!")
-        
+            self.yesno = font.render("不正解",True, (215,255,255))
+
+        text_size = self.yesno.get_rect()
+        self.screen.blit(self.yesno, (self.screen_size[0]//2 - text_size.w//2, self.screen_size[1]//2 - text_size.h//2))
+        self.update_display()
+        pygame.time.wait(2000)
+        print(self.yesno)
+
+            
+        if  len(self.puizues) > 0:      # 今出題したクイズを含むクイズ数が1以上だったら、クイズを削る処理をする。
             self.puizuID=random.randint(0,len(self.puizues)-1)
             self.puizu = self.puizues[self.puizuID]
             self.Q=self.font.render(self.puizu.question,True, (255,255,255))
             self.puizues.pop(self.puizuID)
             self.goke += 1
             self.now_scene="game"
+            self.screen.fill((0,0,0))
+            
+        
+        else:                           # クイズの数が0以下だったら、self.running を False にする。
+            self.running = False
+            # if self.goke == self.Xmon:
+            #     self.running=False        
+            
         
         
         
@@ -194,6 +197,7 @@ class Wold():
         if self.now_scene=="start":
             self.start()
             self.update_display()
+            
             """
             スタート画面用の関数を実行する
             """
@@ -201,10 +205,10 @@ class Wold():
             self.main()
             
             self.sentaku()
-            # self.reply()
+            #self.reply()
             self.update_display()
             
-            
+        
             """""
             クイズゲームをプレイする用の関数を実行する
             """
