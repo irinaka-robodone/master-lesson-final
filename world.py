@@ -85,7 +85,7 @@ class World():
             elif event.type == MOUSEBUTTONDOWN:
                 self.mouse_pos = pygame.mouse.get_pos()
     
-    def add_bullet(self, init_pos, size=(5,5)):
+    def add_bullet(self, init_pos, dx: float, dy: float, size=(5,5)):
         
         self.append()
         self.bullets.append(pygame.Surface((5,5), masks=(255,0,0)))
@@ -112,6 +112,10 @@ class World():
                 elif event.key == K_DOWN:
                     self.player.dy = 2
                     
+                if event.key == K_SPACE:
+                    self.bullets[i].dx, self.bullets[i].dy = (self.mouse_pos[0] - self.player.pos[0])/distance, (self.mouse_pos[1] - self.player.pos[1])/distance
+                    self.add_bullet(self.player.pos[0], (5,5))
+                    
             elif event.type == KEYUP:
                 self.player.dx = 0
                 self.player.dy = 0
@@ -124,7 +128,9 @@ class World():
         self.player.pos[1] += self.player.dy
         
         distance = ((self.mouse_pos[0] - self.player.pos[0])**2 + (self.mouse_pos[1] - self.player.pos[1])**2 )**(1/2)
-        self.bullet_direction = [(self.mouse_pos[0] - self.player.pos[0])/distance, (self.mouse_pos[1] - self.player.pos[1])/distance]
+
+        for i in range(len(self.bullets)):
+            self.bullets[i].pos = 
         print(self.bullet_direction)
         
     def render_bullet(self):
