@@ -10,14 +10,20 @@ class Object():
         self.dx = 0
         self.dy = 0
         
-class Bullet(Object):
-    def __init__(self, rect: pygame.Rect, pos: list[float, float]) -> None:
-        super().__init__(rect, pos)
+class Bullet():
+    def __init__(self, rect: pygame.Rect, pos: list[float, float], dx, dy) -> None:
+        self.rect = rect
+        self.pos = pos
+        self.size = self.rect.get_size()
+        self.dx = dx
+        self.dy = dy
     
     def remove(self):
         """
         remove
         """
+        # del self
+        # return True
 
 class World():
     def __init__(self) -> None:
@@ -74,6 +80,10 @@ class World():
         """
         self.screen.fill((0,0,0), (100, 100, 20, 20))
         self.screen.blit(self.player.player_rect, (self.player.pos[0],self.player.pos[1],self.player.size[0],self.player.size[1]))
+
+        for i, bullet in enumerate(self.bullets):
+            print(f"{i+1}/{len(self.bullets)}, {bullet}")
+            self.screen.blit(bullet.rect, (bullet.pos[0], bullet.pos[1], bullet.size[0], bullet.size[1]))
         
     def process_event(self):
         
@@ -85,20 +95,19 @@ class World():
             elif event.type == MOUSEBUTTONDOWN:
                 self.mouse_pos = pygame.mouse.get_pos()
     
-    def add_bullet(self, init_pos, dx: float, dy: float, size=(5,5)):
+    def add_bullet(self, bullet: Bullet):
         
-        self.append()
-        self.bullets.append(pygame.Surface((5,5), masks=(255,0,0)))
-    
+        self.bullets.append(bullet)
+
     def update_pos(self):
         direction_key_any_down = False
         does_stop = False
+        
+        distance = ((self.mouse_pos[0] - self.player.pos[0])**2 + (self.mouse_pos[1] - self.player.pos[1])**2 )**(1/2)
+        
         for event in pygame.event.get():
             if event.type == QUIT:
                 self.running = False
-                
-            if event.type == MOUSEBUTTONDOWN:
-                self.mouse_pos = pygame.mouse.get_pos()
 
             elif event.type == KEYDOWN:
                 if event.key in (K_LEFT, K_RIGHT, K_UP, K_DOWN):
@@ -111,14 +120,25 @@ class World():
                     self.player.dy = -2
                 elif event.key == K_DOWN:
                     self.player.dy = 2
+                elif event.key == K_ESCAPE:
+                    self.running = False
                     
                 if event.key == K_SPACE:
-                    self.bullets[i].dx, self.bullets[i].dy = (self.mouse_pos[0] - self.player.pos[0])/distance, (self.mouse_pos[1] - self.player.pos[1])/distance
-                    self.add_bullet(self.player.pos[0], (5,5))
+                    self.mouse_pos = pygame.mouse.get_pos()
+                    bullet_direction = [(self.mouse_pos[0] - self.player.pos[0])/distance, (self.mouse_pos[1] - self.player.pos[1])/distance]
+                    # rect = pygame.Surface((20,20))
+                    # bullet = Bullet(rect, self.player.pos, bullet_dx, bullet_dy)
+                    self.add_bullet(Bullet(pygame.Surface((5,5), masks=(255,0,0)), self.player.pos, bullet_direction[0], bullet_direction[1]))
+                    print(len(self.bullets), bullet_direction)
                     
             elif event.type == KEYUP:
-                self.player.dx = 0
                 self.player.dy = 0
+                self.player.dx = 0
+
+        # print(self.mouse_pos)
+            # elif event.type == KEYUP:
+            #     self.player.dx = 0
+            #     self.player.dy = 0
                     
         # if not direction_key_any_down:
         #     self.player.dx = 0
@@ -126,17 +146,17 @@ class World():
         
         self.player.pos[0] += self.player.dx
         self.player.pos[1] += self.player.dy
-        
-        distance = ((self.mouse_pos[0] - self.player.pos[0])**2 + (self.mouse_pos[1] - self.player.pos[1])**2 )**(1/2)
 
-        for i in range(len(self.bullets)):
-            self.bullets[i].pos = 
-        print(self.bullet_direction)
+        if len(self.bullets) > 0:
+            for bullet in self.bullets:
+                bullet.pos[0] += bullet.dx
+                bullet.pos[1] += bullet.dy
+        # print(self.bullet_direction)
         
-    def render_bullet(self):
-        bullet = pygame.Surface((20,20), masks=(255,0,0))
-        self.screen.blit(bullet, (200,200,20,20))
-        print(bullet)
+    # def render_bullet(self):
+    #     bullet = pygame.Surface((20,20), masks=(255,0,0))
+    #     self.screen.blit(bullet, (200,200,20,20))
+    #     print(bullet)
     
     def process(self):
         self.clock.tick(self.FPS)
@@ -148,6 +168,6 @@ class World():
             self.render_map()
             self.update_pos()
             self.render_object()
-            self.render_bullet()
+            # self.render_bullet()
             self.update_display()
             self.process_event()
