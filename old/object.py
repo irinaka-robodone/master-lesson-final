@@ -1,6 +1,5 @@
 import random
 import pygame
-
 class Enemy():
     
     def __init__(self, hp, guard) -> None:
