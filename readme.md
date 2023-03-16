@@ -1,4 +1,13 @@
-## master lesson final しととりゲーム制作
+# ロボ団いりなか校　マスタークラスの卒業制作
 
-## Reference
-text.py, draw.py は @DYGv (https://github.com/DYGV) の https://dygv.github.io/blog/post/2021/01/pygame%E3%81%AE%E3%83%86%E3%82%AD%E3%82%B9%E3%83%88%E5%85%A5%E5%8A%9B/ の記事を参考にしています。
+## ■成果物
+Pythonで書いた「しりとりゲーム」
+
+## ■概要
+Pygameで日本語/英語でしりとりができるシンプルなゲームです。
+Pygame v1.9.5 からIME切り替えに標準で対応したため英語/日本語での文字入力ができるようになりました。
+
+@DYGV さんが公開している Pygame用のマルチバイト文字対応の文字入力ライブラリ [pygame_textinput](https://github.com/DYGV/pygame_textinput) を利用して、しりとりゲームで必要なユーザーによる単語入力を実装しました。
+
+## ■How to play
+
