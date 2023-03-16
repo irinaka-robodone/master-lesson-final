@@ -5,8 +5,8 @@ import pygame
 SCREEN_SIZE = (960, 640)        # 全部大文字のやつ: 定数
 def main():
     world =wold.World()
-    player_rect= pygame.image.load('asset/player.png', 'player-santa')
-    world.add_player(player_rect, [100,100])
+    player_image= pygame.image.load('asset/player.png', 'player-santa')
+    world.add_player(player_image, [100,100])
     while world.running:
         world.process()
 

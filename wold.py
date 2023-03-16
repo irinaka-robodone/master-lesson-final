@@ -3,12 +3,17 @@ from pygame.locals import *
 
 pygame.init()
 class Object():
-    def __init__(self,rect: pygame.Rect,pos:list[float,float]) -> None:
-        self.player_rect=rect
+    def __init__(self,image: pygame.Rect,pos:list[float,float]) -> None:
+        self.image=image
         self.pos=pos
-        self.size=self.player_rect.get_size()
+        
         self.dx=0
         self.dy=0
+        self.picture_pos = [0,0]
+        self.rect = self.image.subsurface(0,0,32,32)
+        self.size=self.rect.get_size()
+                    
+        
         
 class Bullet(Object):
     def __init__(self, rect: pygame.Rect, pos: list[float, float]) -> None:
@@ -42,16 +47,18 @@ class World():
     def update_display(self):
         pygame.display.flip()
         pygame.display.update()
+        
     def render_object(self):
         self.screen.fill((255,255,255))
             
         """
         render object
         """
-        
+        self.player.rect = self.player.image.subsurface(self.player.picture_pos[0], self.player.picture_pos[1], 32 , 32)
         self.screen.fill((0,0,0), (100, 100, 20, 20))
-        self.screen.blit(self.player.player_rect,((self.player.pos[0],self.player.pos[1],self.player.size[0],self.player.size[1])))
-        
+        self.screen.blit(self.player.rect,((self.player.pos[0],self.player.pos[1],self.player.size[0],self.player.size[1])))
+    
+    
     def add_player(self, player_rect: pygame.Rect, pos: list[float, float]):
         self.player = Object(player_rect, pos)
     def start_screen(self):
@@ -87,29 +94,31 @@ class World():
             if event.type == QUIT:
                 self.running =False
             
-            elif event.type ==MOUSEBUTTONDOWN:
-                self.mouse_pos =pygame.mouse.get_pos()
+            # elif event.type ==MOUSEBUTTONDOWN:
+            #     self.mouse_pos =pygame.mouse.get_pos()
             
             elif event.type == KEYDOWN:
                 if event.key == K_ESCAPE:
                     self.running = False
                 if event.key in (K_LEFT, K_RIGHT, K_UP, K_DOWN):
                     direction_key_any_down = True
-                if event.key == K_LEFT:
+                if event.key == K_a:
                     self.player.dx = -2
-                if event.key == K_RIGHT:
+                    self.player.picture_pos = [0,32]
+                if event.key == K_d:
                     self.player.dx = 2
-                if event.key == K_UP:
+                    self.player.picture_pos = [0,64]
+                if event.key == K_w:
                     self.player.dy = -2
-                if event.key == K_DOWN:
-                    self.player.dx = 2
-            
-                
-            
+                    self.player.picture_pos = [0,96]
+                if event.key == K_s:
+                    self.player.dy = 2
+                    self.player.picture_pos =[0,0]
             
             elif event.type ==KEYUP:
                 self.player.dx =0
                 self.player.dy =0
+        # print(self.player.dx, self.player.dy)
         
         self.player.pos[0] += self.player.dx
         self.player.pos[1] += self.player.dy
@@ -123,6 +132,12 @@ class World():
         self.append()
         self.bullets.append(pygame.Surface((5,5), masks=(255,0,0)))
         
+    def animation(self):
+        self.anime_step =0
+        self.anime_step +=0.001
+        if self.anime_step > 2:
+            self.anime_step =0
+        self.player.picture_pos = (30 * int(self.anime_step), self.player.picture_pos[1]) 
         
     def render_bullet(self):
         bullet= pygame.Surface((20,20), masks=(255,0,0))
@@ -150,9 +165,10 @@ class World():
             self.start_screen()
             self.update_display()
         elif self.current_scene == "main":
-            self.render_map()
+            # self.render_map()
             self.update_pos()
             self.render_object()
             self.update_display()
-            self.render_bullet()
-            self.process_event()
+            self.animation()
+            # self.render_bullet()
+            # self.process_event()
