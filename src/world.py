@@ -3,15 +3,7 @@ import random
 sys.path.append("../")
 import pygame
 import pygame_gui
-import tkinter as tk
-from tkinter import *
-from tkinter import ttk
-
-root = Tk()
-# frm = ttk.Frame(root, padding=10)
-# frm.grid()
-# ttk.Label(frm, text="Hello World!").grid(column=0, row=0)\
-
+from pygame_textinput.textinput import TextInput
 
 SCREEN_SIZE=(900,600)
 FPS = 60
@@ -44,12 +36,14 @@ class World():
 
 
         self.curent_scene = "menyu"
-        self.mae_word = "siritori"
+        self.mae_word = "りんご"
 
         pygame.init()
         pygame.display.set_caption("しりとりゲーム")
         self.window = pygame.display.set_mode(SCREEN_SIZE)
         self.window.fill((255,255,255))
+
+        self.text_box = TextInput(pygame.font.SysFont("yumincho", 30), (255, 0, 0))
 
         self.manager = pygame_gui.UIManager(
             SCREEN_SIZE,
@@ -92,22 +86,13 @@ class World():
         clock.tick(FPS)
 
     def nyuryoku(self):
-        root = Tk()
-        root.geometry("900x600")
         self.window.fill((255,255,255))
 
         textbox_x = (SCREEN_SIZE[0] - 100) // 2
         textbox_y = (SCREEN_SIZE[1]- 30) // 2
 
-        SCREEN_SIZE[0]//2 - 500//2, SCREEN_SIZE[1]//2 - 30//2
-
-        # テキストボックスの作成
-        # textbox = tk.Entry(root, font=('Arial', 24), bg='white')
-        # textbox.place(x=textbox_x, y=textbox_y, width=100, height=30)
-
-
-
-        for event in pygame.event.get():
+        events = pygame.event.get()
+        for event in events:
             if event.type == pygame.QUIT:
                 # running = False
                 pygame.quit()
@@ -126,21 +111,40 @@ class World():
                     # show_text(self.window, event.text)
                     pass
 
-            elif event.type == pygame_gui.UI_TEXT_ENTRY_FINISHED and event.ui_object_id == "#main_text_entry":
-                if self.mae_word[-1]== event.text[0]:
-                    self.mae_word = event.text
-                    self.siritori_rekisi.append(event.text)
+            if event.type == pygame.USEREVENT:
+                # 入力確定したテキスト
+                print(event.Text)
+                if len(self.mae_word) < 1 or len(event.Text) < 1:
+                    continue
+                elif self.mae_word[-1]== event.Text[0] and event.Text not in self.siritori_rekisi:
+                    self.mae_word = event.Text
+                    self.siritori_rekisi.append(event.Text)
+
                 else:
-                    self.running = False
+                    print("otetuki")
+                    otetsuki = self.taitoru_font.render("お手つき！", True, (0,0,0))
+                    otetsuki_rect = otetsuki.get_rect(center=(SCREEN_SIZE[0]//2, SCREEN_SIZE[1]//2))
+                    self.window.blit(otetsuki, otetsuki_rect)
+                    self.update_display()
+                    pygame.time.wait(1000)
+                    # self.running = False
+
+            # elif event.type == pygame_gui.UI_TEXT_ENTRY_FINISHED and event.ui_object_id == "#main_text_entry":
                 # show_text(self.window, event.text)
 
             self.manager.process_events(event)
 
+        # self.window.fill((100, 225, 255))
+        self.text_box.update(events)
+        text_box_rect = self.text_box.get_surface().get_rect(center=(SCREEN_SIZE[0]//2, SCREEN_SIZE[1]//2))
+        self.window.blit(self.text_box.get_surface(), text_box_rect)
+
+
         time_delta = clock.tick(FPS)/ 1000.0
         moji = self.mae_word
 
-        self.manager.update(time_delta)
-        self.manager.draw_ui(self.window)
+        # self.manager.update(time_delta)
+        # self.manager.draw_ui(self.window)
         bun_text = self.bun_font.render(self.mae_word, True, (10,10,10))
         bun_text_rect = bun_text.get_rect(center=(SCREEN_SIZE[0]//2, SCREEN_SIZE[1]//2-100))
         #show_text(self.window, )
@@ -168,7 +172,9 @@ class World():
         clock.tick(FPS)
 
         # root.mainloop()
-
+    def update_display(self):
+        pygame.display.flip()
+        pygame.display.update()
 
     def init(self):
         pygame.init()
