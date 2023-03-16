@@ -18,6 +18,7 @@ running = True
 
 class Wold():
     def __init__(self, quiz_filepath: str) -> None:
+        self.quiz_filepath = quiz_filepath
         
         self.puizues=puizuBOX(quiz_filepath)
         self.puizuID = random.randint(0,len(self.puizues)-1)  
@@ -32,9 +33,10 @@ class Wold():
         self.screen_size = (900, 600)
         self.screen=pygame.display.set_mode(self.screen_size)
         self.cotae=self.puizu.answer
-        
+        self.seikai=0
+        self.an_seikai=0
         self.tou_answer=0
-        
+        self.mondaisu=0
         self.a = self.puizu.choices[0]
         self.b = self.puizu.choices[1]
         self.c = self.puizu.choices[2]
@@ -44,10 +46,11 @@ class Wold():
         self.Q=self.font.render(self.puizu.question,True, (255,255,255))
     
     def start(self):
+        self.__init__(self.quiz_filepath)
         self.screen.fill((255,255,255))
         self.taitoru=self.font.render("クイズゲーム エンターキーを押してね",True, (215,115,215))
         self.screen.blit(self.taitoru,(10,10))
-        for event in pygame.event.get():
+        for event in self.events:
             if event.type ==KEYDOWN:
                 if event.key ==K_ESCAPE:
                     pygame.quit()
@@ -72,16 +75,10 @@ class Wold():
         self.sentacu_4=self.font.render(f"D:{self.puizu.choices[3]}",True, (255,255,255))
         self.screen.blit(self.sentacu_4,(50,250))
             
-            
-            
-            
-            
-            
-            
-            
+        
     def main(self):
         # self.screen.fill((0,0,0))
-        for event in pygame.event.get():
+        for event in self.events:
             if event.type ==K_SPACE:
                 pygame.quit()
                 sys.exit()
@@ -115,7 +112,7 @@ class Wold():
                     # self.Q=self.font.render(self.puizu.question,True, (255,255,255))
                     # self.puizues.pop(puizuID)
                     #self.goke += 1
-        print(self.tou_answer, self.puizu.answer,self.goke)
+        print(self.tou_answer, self.puizu.answer,self.goke,self.seikai,self.an_seikai,self.mondaisu)
 
         
                         
@@ -125,7 +122,8 @@ class Wold():
         pygame.display.flip()
         pygame.display.update()
     
-    
+    def get_events(self):
+        self.events = pygame.event.get()
         
     # def reply(self):
     #     if self.tou_answer == self.puizu.answer:
@@ -144,30 +142,35 @@ class Wold():
     #         self.tou_answer=0
         
     def handan(self):
-        # self.screen.fill((0,0,0))
+        self.now_scene = "game"
+        self.screen.fill((0,0,0))
         font = pygame.font.SysFont("MS UI Gothic", 48, bold=True)
-        
-        for event in pygame.event.get():
-                if event.type ==K_SPACE:
-                    pygame.quit()
-                    sys.exit()
-                
-                if event.type == pygame.QUIT:
-                    pygame.quit()
-                    sys.exit()
-                
-                # if event.type == KEYDOWN:
-                #     if event.key ==K_0:
-                #         self.now_scene="game"
+        self.mondaisu += 1
+        for event in self.events:
+            if event.type ==K_SPACE:
+                pygame.quit()
+                sys.exit()
+            
+            if event.type == pygame.QUIT:
+                pygame.quit()
+                sys.exit()
+            
+            # if event.type == KEYDOWN:
+            #     if event.key ==K_0:
+            #         self.now_scene="game"
             
         if self.tou_answer == self.puizu.answer:
+            self.seikai += 1
             print("yes")
             self.yesno = font.render("正解",True, (255,255,115))
-        
+
+            
         else:
+            self.an_seikai += 1
             print("No!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!")
             self.yesno = font.render("不正解",True, (215,255,255))
-
+            
+            
         text_size = self.yesno.get_rect()
         self.screen.blit(self.yesno, (self.screen_size[0]//2 - text_size.w//2, self.screen_size[1]//2 - text_size.h//2))
         self.update_display()
@@ -183,43 +186,54 @@ class Wold():
             self.goke += 1
             self.now_scene="game"
             self.screen.fill((0,0,0))
-            
-        
+                        
+        elif self.mondaisu >= self.Xmon:
+            self.now_scene="kekka"
+
         else:                           # クイズの数が0以下だったら、self.running を False にする。
             self.running = False
             # if self.goke == self.Xmon:
             #     self.running=False        
             
+    def result(self):
+        self.screen.fill((0,0,0))
+        self.se=self.font.render(str(self.seikai),True, (255,255,255))
+        self.an_se=self.font.render(str(self.an_seikai),True, (255,255,255))
+        self.screen.blit(self.se,(10,10))
+        self.screen.blit(self.an_se,(100,10))
+        self.update_display()
+        # self.se=self.font.render(str(self.seikai),True, (255,255,255))
+        # self.an_se=self.font.render(str(self.an_seikai),True, (255,255,255))
+        # self.screen.blit(self.se,(10,10))
+        # self.screen.blit(self.an_se,(100,10))
         
-        
-        
+        pygame.time.wait(2000)
+        self.now_scene = "start"
+
     def process(self):
         if self.now_scene=="start":
-            self.start()
-            self.update_display()
-            
             """
             スタート画面用の関数を実行する
             """
-        elif self.now_scene=="game":
-            self.main()
-            
-            self.sentaku()
-            #self.reply()
+            self.get_events()
+            self.start()
             self.update_display()
             
-        
+        elif self.now_scene=="game":
             """""
             クイズゲームをプレイする用の関数を実行する
             """
-            
+            self.get_events()
+            self.main()
+            self.sentaku()
+            self.update_display()
             
         elif self.now_scene=="jazzi":
-            
+            self.get_events()
             self.handan()
             self.update_display()
             
-            
-            
-            
-            
+        elif self.now_scene=="kekka":
+            self.get_events()
+            self.result()
+            self.update_display()
