@@ -30,6 +30,7 @@ class World():
         self.running=True
         self.current_scene="start"
         self.EPS=60
+        self.anime_step = 0
         self.clock=pygame.time.Clock()
         pygame.init()
         
@@ -133,10 +134,10 @@ class World():
         self.bullets.append(pygame.Surface((5,5), masks=(255,0,0)))
         
     def animation(self):
-        self.anime_step =0
-        self.anime_step +=0.001
+        self.anime_step +=0.1
         if self.anime_step > 2:
             self.anime_step =0
+        print(30*int(self.anime_step))
         self.player.picture_pos = (30 * int(self.anime_step), self.player.picture_pos[1]) 
         
     def render_bullet(self):
@@ -161,6 +162,7 @@ class World():
         
 
     def process(self):
+        self.clock.tick(60)
         if self.current_scene=="start":
             self.start_screen()
             self.update_display()
