@@ -34,6 +34,8 @@ class World():
         self.enta_font = pygame.font.Font("font/NotoSansJP-Black.otf",30)
         self.bun_font = pygame.font.Font("font/NotoSansJP-Black.otf",40)
 
+        self.screen.blit("bg.jpg")
+
 
         self.curent_scene = "menyu"
         self.mae_word = "りんご"
@@ -58,6 +60,7 @@ class World():
 
         self.siritori_rekisi = [self.mae_word]
 
+        self.otetuki_kaunto =  0
 
 
     def show_start_screen(self):
@@ -116,9 +119,17 @@ class World():
                 print(event.Text)
                 if len(self.mae_word) < 1 or len(event.Text) < 1:
                     continue
+                elif event.Text[-1] == "ん":
+                    otetsuki = self.taitoru_font.render("お手つき！", True, (0,0,0))
+                    otetsuki_rect = otetsuki.get_rect(center=(SCREEN_SIZE[0]//2, SCREEN_SIZE[1]//2))
+                    self.window.blit(otetsuki, otetsuki_rect)
+                    self.update_display()
+                    pygame.time.wait(1000)
+
                 elif self.mae_word[-1]== event.Text[0] and event.Text not in self.siritori_rekisi:
                     self.mae_word = event.Text
                     self.siritori_rekisi.append(event.Text)
+                #elif self.otetuki_kaunto = [+1]
 
                 else:
                     print("otetuki")
