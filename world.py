@@ -21,7 +21,7 @@ class Wold():
         self.quiz_filepath = quiz_filepath
         
         self.puizues=puizuBOX(quiz_filepath)
-        self.puizues = random.sample(self.puizues, 10)
+        self.puizues = random.sample(self.puizues, 2)
         self.puizuID = random.randint(0,len(self.puizues)-1)
         self.puizu= self.puizues[self.puizuID]
         self.Xmon=len(self.puizues)
