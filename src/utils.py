@@ -1,12 +1,7 @@
 import csv
-import pprint
-import object
-from object import Puizu
-import random
-
-#def callback_func():
-
-
+import pygame
+from pygame.locals import*
+from .object import Puizu
 
 def puizuBOX(file):
     puizus=[]
@@ -32,6 +27,17 @@ def puizuBOX(file):
                 
                 puizus.append(puizu)
     return puizus
+
+def render_text(screen: pygame.Surface, text: str, size: int, color: tuple, font_name: str = "MS UI Gothic", pos: list[2] = "center", bold: bool = True, italic: bool = False, padding_top: int = 0):
+    font = pygame.font.SysFont(font_name, size, bold, italic)
+    rend = font.render(text, True, color)
+    frame_size = rend.get_rect()
+    
+    if pos == "center":
+        screen.blit(rend, (screen.get_width()//2 - frame_size.w//2, screen.get_height()//2 - frame_size.h//2 + padding_top))
+    else:
+        screen.blit(rend, pos)
+        
 #puizues=puizuBOX()
 # puizues = puizues[random.randint(0,2)]
 # print(puizues)

@@ -1,7 +1,7 @@
 from pygame.locals import*
-from world import Wold
+from src.world import World
 
-wold=Wold("asset/bun_v2.csv")
+world=World("asset/qa_v2.csv", 5, 5)
 
-while wold.running :
-    wold.process()
+while world.running :
+    world.process()
