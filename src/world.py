@@ -1,66 +1,38 @@
 import sys
 import random
-sys.path.append("../")
 import pygame
-import pygame_gui
 from pygame_textinput.textinput import TextInput
+
+from utils import render_text
 
 SCREEN_SIZE=(900,600)
 FPS = 60
-clock = pygame.time.Clock()
-def show_text(window, text):
-    running = True
-    while running:
-        for event in pygame.event.get():
-            if event.type == pygame.QUIT:
-                # running = False
-                pygame.quit()
-                sys.exit()
-        window.fill((255,255,255))
-        new_text = pygame.font.SysFont("MS P ゴシック", 20).render(text, True, (10,10,10))
-        new_text_rect = new_text.get_rect(center=(SCREEN_SIZE[0]//2, SCREEN_SIZE[1]//2))
-        window.blit(new_text, new_text_rect)
-        pygame.display.flip()
-        pygame.display.update()
-        clock.tick(FPS)
-
 
 class World():
     def __init__(self) -> None:
         self.running= True
-
         # self.font = pygame.font.SysFont("Noto Sans JP", 20)
         self.taitoru_font = pygame.font.Font("font/NotoSansJP-Black.otf", 60)
         self.enta_font = pygame.font.Font("font/NotoSansJP-Black.otf",30)
         self.bun_font = pygame.font.Font("font/NotoSansJP-Black.otf",40)
 
-        self.screen.blit("bg.jpg")
-
-
-        self.curent_scene = "menyu"
-        self.mae_word = "りんご"
-
         pygame.init()
+        self.clock = pygame.time.Clock()
         pygame.display.set_caption("しりとりゲーム")
         self.window = pygame.display.set_mode(SCREEN_SIZE)
         self.window.fill((255,255,255))
-
+        
+        self.bg_img = pygame.image.load("../asset/bg.jpg")
+        
+        self.current_scene = "start"
+        
         self.text_box = TextInput(pygame.font.SysFont("yumincho", 30), (255, 0, 0))
-
-        self.manager = pygame_gui.UIManager(
-            SCREEN_SIZE,
-            theme_path="theme.json"
-        )
-
-        self.input_box = pygame_gui.elements.UITextEntryLine(
-            pygame.Rect(SCREEN_SIZE[0]//2 - 500//2, SCREEN_SIZE[1]//2 - 30//2, 500, 40),
-            self.manager,
-            object_id="#main_text_entry"
-        )
-
-        self.siritori_rekisi = [self.mae_word]
-
+        # self.siritori_history = ["りんご", "ごりら", "らっぱ", "ぱんつ", "つみき", "きつつき", "きんぱ", "ぱりぴ", "ぴっと", "とーます", "するめ", "めんこ", "こあら", "らじお", "おがわ", "わに", "にんにく", "くりすます", "すいか", "からす"]
+        self.siritori_history = ["しりとり"]
+        self.mae_word = self.siritori_history[-1]
         self.otetuki_kaunto =  0
+        
+        self.prev_answer_input = False
 
 
     def show_start_screen(self):
@@ -71,121 +43,149 @@ class World():
                 pygame.quit()
                 sys.exit()
             elif event.type == pygame.KEYDOWN:
+                if event.key == pygame.K_ESCAPE:
+                    pygame.quit()
+                    sys.exit()
+                    
                 if event.key == pygame.K_RETURN:
-                    self.curent_scene = "nyuryoku"
-        self.window.fill((255,255,255))
+                    self.current_scene = "play"
+                    
+                elif event.key == pygame.K_SPACE:
+                    self.current_scene = "history"
+        
+        render_text(self.window, "しりとりゲーム!", 70, (10,10,10), font_pass="font/NotoSansJP-Black.otf", pos="center", padding_top=-120)
+        render_text(self.window, "Enterキーを押してスタート", 28, (10,10,10), font_pass="font/NotoSansJP-Black.otf", pos="center", padding_top=40)
+        render_text(self.window, "Escキーを押して終了", 28, (10,10,10), font_pass="font/NotoSansJP-Black.otf", pos="center", padding_top=100)
+        render_text(self.window, "Spaceキー(半角)を押して、しりとりの履歴を表示", 28, (10,10,10), font_pass="font/NotoSansJP-Black.otf", pos="center", padding_top=160)
 
-        taitoru_text = self.taitoru_font.render("しりとりゲーム‼", True, (10,10,10))
-        taitoru_text_rect = taitoru_text.get_rect(center=(SCREEN_SIZE[0]//2, SCREEN_SIZE[1]//2-50))
-        self.window.blit(taitoru_text, taitoru_text_rect)
 
-        enta_text = self.enta_font.render("Enterキーを押してスタート", True, (15,10,10))
-        enta_text_rect = enta_text.get_rect(center=(SCREEN_SIZE[0]//2, SCREEN_SIZE[1]//2+50))
-        self.window.blit(enta_text, enta_text_rect)
+    def play_siritori(self):
+        answer = ""
+        events = pygame.event.get()
+        for event in events:
+            if event.type == pygame.KEYDOWN:
+                if event.key == pygame.K_RETURN and self.prev_answer_input == True:
+                    
+                    if self.answer[-1] != "ん" and self.mae_word[-1]== self.answer[0] and self.answer not in self.siritori_history:
+                        self.mae_word = self.answer
+                        self.siritori_history.append(self.answer)
+                        
+                    else:
+                        print("Mistake!")
+                        self.otetuki_kaunto += 1
+                        self.current_scene = "mistake"
+                        self.prev_answer_input = False
+                        self.text_box.text = "|"
+                        
+            
+            if event.type == pygame.TEXTINPUT:
+                # print(event.text)
+                if len(self.mae_word) < 1 or len(event.text) < 1:
+                    continue
 
+                else:
+                    self.answer = event.text
+                    self.prev_answer_input = True
+            
+            # if event.type == pygame.USEREVENT:
+            #     # 入力確定したテキスト
+            #     print(event)
+            #     if len(self.mae_word) < 1 or len(event.Text) < 1:
+            #         continue
+            #     elif event.Text[-1] == "ん":
+            #         otetsuki = self.taitoru_font.render("お手つき！", True, (0,0,0))
+            #         otetsuki_rect = otetsuki.get_rect(center=(SCREEN_SIZE[0]//2, SCREEN_SIZE[1]//2))
+            #         self.window.blit(otetsuki, otetsuki_rect)
+            #         self.update_display()
+            #         pygame.time.wait(1000)
 
-        pygame.display.flip()
-        pygame.display.update()
-        clock.tick(FPS)
+            #     elif self.mae_word[-1]== event.Text[0] and event.Text not in self.siritori_history:
+            #         self.mae_word = event.Text
+            #         self.siritori_history.append(event.Text)
+            #     #elif self.otetuki_kaunto = [+1]
 
-    def nyuryoku(self):
-        self.window.fill((255,255,255))
+            #     else:
+            #         print("otetuki")
+            #         otetsuki = self.taitoru_font.render("お手つき！", True, (0,0,0))
+            #         otetsuki_rect = otetsuki.get_rect(center=(SCREEN_SIZE[0]//2, SCREEN_SIZE[1]//2))
+            #         self.window.blit(otetsuki, otetsuki_rect)
+            #         self.update_display()
+            #         pygame.time.wait(1000)
+            #         # self.running = False
+                
+            if event.type == pygame.QUIT:
+                # running = False
+                pygame.quit()
+                sys.exit()
+                
+            if event.type == pygame.KEYDOWN:
+                if event.key == pygame.K_ESCAPE:
+                    self.current_scene = "start"
+        
+        self.text_box.update(events)
+        text_box_rect = self.text_box.get_surface().get_rect(center=(SCREEN_SIZE[0]//2, SCREEN_SIZE[1]//2))
+        self.window.blit(self.text_box.get_surface(), text_box_rect)
+        bun_text = self.bun_font.render(self.mae_word, True, (10,10,10))
+        bun_text_rect = bun_text.get_rect(center=(SCREEN_SIZE[0]//2, SCREEN_SIZE[1]//2-100))
+        self.window.blit(bun_text, bun_text_rect)
 
-        textbox_x = (SCREEN_SIZE[0] - 100) // 2
-        textbox_y = (SCREEN_SIZE[1]- 30) // 2
+        bun_text = self.bun_font.render("▼", True, (10,10,10))
+        bun_text_rect = bun_text.get_rect(center=(SCREEN_SIZE[0]//2, SCREEN_SIZE[1]//2-150))
+        self.window.blit(bun_text, bun_text_rect)
 
+        if len(self.siritori_history) >= 2:
+            bun_text = self.bun_font.render(self.siritori_history[-2], True, (10,10,10))
+            bun_text_rect = bun_text.get_rect(center=(SCREEN_SIZE[0]//2, SCREEN_SIZE[1]//2-200))
+            self.window.blit(bun_text, bun_text_rect)
+
+        bun_text = self.bun_font.render("▼", True, (10,10,10))
+        bun_text_rect = bun_text.get_rect(center=(SCREEN_SIZE[0]//2, SCREEN_SIZE[1]//2-50))
+        self.window.blit(bun_text, bun_text_rect)
+        
+        render_text(self.window, "Escキーを押してスタート画面に戻る", 20, (10,10,10), font_pass="font/NotoSansJP-Black.otf", pos = (550,550))
+        
+    def show_help(self):
+        render_text(self.window, "お手つき!", 50, font_pass = "font/NotoSansJP-Black.otf", color = (10,10,10), pos = "center", padding_top= -40)
+        render_text(self.window, "続けるにはEnterキーを押してね", 28, font_pass = "font/NotoSansJP-Black.otf", color = (10,10,10), pos = "center", padding_top= 30)
+        
+        events = pygame.event.get()
+        for event in events:
+            if event.type == pygame.KEYDOWN:
+                if event.key == pygame.K_RETURN:
+                    self.current_scene = "play"
+            
+    def show_history(self):
         events = pygame.event.get()
         for event in events:
             if event.type == pygame.QUIT:
                 # running = False
                 pygame.quit()
                 sys.exit()
-            elif event.type == pygame.KEYDOWN:
-                if event.key == pygame.K_RETURN:
+                
+            if event.type == pygame.KEYDOWN:
+                if event.key == pygame.K_ESCAPE:
+                    self.current_scene = "start"
+        
+        render_text(self.window, "ここまでのしりとり履歴", 24, (10,10,10), font_pass="font/NotoSansJP-Black.otf", pos = (40,20))
+        j = 0
+        for i, noun in enumerate(self.siritori_history):
+            
+            col = i//10
+            index = i%10
+            render_text(self.window, f"{i+1}: {noun}", 16, (10,10,10), font_pass = "font/NotoSansJP-Black.otf", pos=(60 + 200*col, 80 + 45*index))
+            render_text(self.window, "▼", 16, (10,10,10), font_pass= "font/NotoSansJP-Black.otf", pos=(90 + 200*col, 100+45*index))
+        
+        render_text(self.window, "Escキーを押してスタート画面に戻る", 20, (10,10,10), font_pass="font/NotoSansJP-Black.otf", pos = (550,550))
+        
+    def draw_bg(self):
+        self.window.fill((255,255,255))
+        self.bg_img = pygame.transform.scale(self.bg_img, (900, 600)) 
+        self.window.blit(self.bg_img, (0,0), )
 
-                    # text = textbox.get(())
-                    self.curent_scene = "nyuryoku"
-
-                    # if self.mae_word[-1] == text[0]:
-                    #     self.mae_word = text
-                    #     self.siritori_rekisi.append(text)
-                    # else:
-                    #     pass
-                    # show_text(self.window, event.text)
-                    pass
-
-            if event.type == pygame.USEREVENT:
-                # 入力確定したテキスト
-                print(event.Text)
-                if len(self.mae_word) < 1 or len(event.Text) < 1:
-                    continue
-                elif event.Text[-1] == "ん":
-                    otetsuki = self.taitoru_font.render("お手つき！", True, (0,0,0))
-                    otetsuki_rect = otetsuki.get_rect(center=(SCREEN_SIZE[0]//2, SCREEN_SIZE[1]//2))
-                    self.window.blit(otetsuki, otetsuki_rect)
-                    self.update_display()
-                    pygame.time.wait(1000)
-
-                elif self.mae_word[-1]== event.Text[0] and event.Text not in self.siritori_rekisi:
-                    self.mae_word = event.Text
-                    self.siritori_rekisi.append(event.Text)
-                #elif self.otetuki_kaunto = [+1]
-
-                else:
-                    print("otetuki")
-                    otetsuki = self.taitoru_font.render("お手つき！", True, (0,0,0))
-                    otetsuki_rect = otetsuki.get_rect(center=(SCREEN_SIZE[0]//2, SCREEN_SIZE[1]//2))
-                    self.window.blit(otetsuki, otetsuki_rect)
-                    self.update_display()
-                    pygame.time.wait(1000)
-                    # self.running = False
-
-            # elif event.type == pygame_gui.UI_TEXT_ENTRY_FINISHED and event.ui_object_id == "#main_text_entry":
-                # show_text(self.window, event.text)
-
-            self.manager.process_events(event)
-
-        # self.window.fill((100, 225, 255))
-        self.text_box.update(events)
-        text_box_rect = self.text_box.get_surface().get_rect(center=(SCREEN_SIZE[0]//2, SCREEN_SIZE[1]//2))
-        self.window.blit(self.text_box.get_surface(), text_box_rect)
-
-
-        time_delta = clock.tick(FPS)/ 1000.0
-        moji = self.mae_word
-
-        # self.manager.update(time_delta)
-        # self.manager.draw_ui(self.window)
-        bun_text = self.bun_font.render(self.mae_word, True, (10,10,10))
-        bun_text_rect = bun_text.get_rect(center=(SCREEN_SIZE[0]//2, SCREEN_SIZE[1]//2-100))
-        #show_text(self.window, )
-        self.window.blit(bun_text, bun_text_rect)
-        # show_text(self.window, self.mae_word)
-
-
-        bun_text = self.bun_font.render("▼", True, (10,10,10))
-        bun_text_rect = bun_text.get_rect(center=(SCREEN_SIZE[0]//2, SCREEN_SIZE[1]//2-150))
-        self.window.blit(bun_text, bun_text_rect)
-
-        if len(self.siritori_rekisi) >= 2:
-            bun_text = self.bun_font.render(self.siritori_rekisi[-2], True, (10,10,10))
-            bun_text_rect = bun_text.get_rect(center=(SCREEN_SIZE[0]//2, SCREEN_SIZE[1]//2-200))
-            #show_text(self.window, )
-            self.window.blit(bun_text, bun_text_rect)
-
-
-        bun_text = self.bun_font.render("▼", True, (10,10,10))
-        bun_text_rect = bun_text.get_rect(center=(SCREEN_SIZE[0]//2, SCREEN_SIZE[1]//2-50))
-        #show_text(self.window, )
-        self.window.blit(bun_text, bun_text_rect)
-        pygame.display.flip()
-        pygame.display.update()
-        clock.tick(FPS)
-
-        # root.mainloop()
     def update_display(self):
         pygame.display.flip()
         pygame.display.update()
+        self.clock.tick(FPS)
 
     def init(self):
         pygame.init()
@@ -194,12 +194,25 @@ class World():
         window.fill((255,255,255))
 
         return window
-    def main():
-        clock = pygame.time.Clock()
+    
 
     def pro(self):
-        if self.curent_scene == "menyu":
+        if self.current_scene == "start":
+            self.draw_bg()
             self.show_start_screen()
+            self.update_display()
 
-        elif self.curent_scene == "nyuryoku":
-            self.nyuryoku()
+        elif self.current_scene == "play":
+            self.draw_bg()
+            self.play_siritori()
+            self.update_display()
+            
+        elif self.current_scene == "mistake":
+            self.draw_bg()
+            self.show_help()
+            self.update_display()
+            
+        elif self.current_scene == "history":
+            self.draw_bg()
+            self.show_history()
+            self.update_display()
